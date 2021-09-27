@@ -3,3 +3,8 @@
 //
 
 #include "MoveForwardCommand.hpp"
+#include "GameActor.hpp"
+
+void MoveForwardCommand::execute(GameActor &actor) {
+    actor.moveForward();
+}

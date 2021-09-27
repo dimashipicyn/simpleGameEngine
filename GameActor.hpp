@@ -9,24 +9,29 @@
 
 class GameActor {
 public:
-    GameActor() :
-    moveForward_(false),
-    moveBackward_(false),
-    moveLeft_(false),
-    moveRight_(false)
-    {
-
-    }
-    void moveForward() {
-        moveForward_ = true;
-    }
+    GameActor();
+    void            setPosition(sf::Vector2f pos);
+    sf::Vector2f    position() const;
+    void            setAngle(double a);
+    double          angle() const;
+    void            moveForward();
+    void            moveBackward();
+    void            moveLeft();
+    void            moveRight();
+    void            rotateLeft();
+    void            rotateRight();
+    void            update();
 
 private:
-    sf::Vector2f position_;
+    sf::Vector2f    position_;
+    double          angle_;
+    float           step_;
     bool            moveForward_;
     bool            moveBackward_;
     bool            moveLeft_;
     bool            moveRight_;
+    bool            rotateLeft_;
+    bool            rotateRight_;
 };
 
 

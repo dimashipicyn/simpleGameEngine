@@ -17,6 +17,8 @@ private:
     Command *moveBackward_;
     Command *moveLeft_;
     Command *moveRight_;
+    Command *rotateLeft_;
+    Command *rotateRight_;
 };
 
 

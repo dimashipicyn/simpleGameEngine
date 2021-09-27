@@ -4,7 +4,8 @@
 
 #ifndef ENGINE_ICOMMAND_HPP
 #define ENGINE_ICOMMAND_HPP
-#include "GameActor.hpp"
+
+class GameActor;
 
 class Command
 {

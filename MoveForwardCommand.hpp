@@ -8,10 +8,8 @@
 
 class MoveForwardCommand : public Command {
 public:
-    virtual void execute(GameActor &actor) {
-        actor.moveForward();
-    }
+    virtual void execute(GameActor &actor);
 };
 
 
-#endif //ENGINE_FORWARDMOVECOMMAND_HPP
+#endif //ENGINE_MOVEFORWARDCOMMAND_HPP
