@@ -3,79 +3,12 @@
 //
 
 #include "Raycaster.hpp"
-
-static int		inspect(const std::vector<std::string> &map, const Raycaster::Ray &ray, float t_sin, float t_cos)
-{
-    int x;
-    int y;
-
-    if (ray.side)
-    {
-        y = t_sin > 0 ? ray.pos.y : ray.pos.y - 1;
-        x = ray.pos.x;
-    }
-    else
-    {
-        x = t_cos > 0 ? ray.pos.x : ray.pos.x - 1;
-        y = ray.pos.y;
-    }
-    if (map[y][x] == '1')
-        return (1);
-    return (0);
-}
-
-static Raycaster::Ray	cast_a_ray(const sf::Vector2f &startPoint, float t_sin, float t_cos, const std::vector<std::string> &map)
-{
-    Raycaster::Ray	a;
-    Raycaster::Ray	b;
-    Raycaster::Ray	ray;
-
-    ray.pos.x = startPoint.x;
-    ray.pos.y = startPoint.y;
-    while (1)
-    {
-        a.pos.x = t_cos > 0 ? floor(ray.pos.x + 1) - ray.pos.x : ceil(ray.pos.x - 1) - ray.pos.x;
-        a.pos.y = a.pos.x * (t_sin / t_cos);
-        b.pos.y = t_sin > 0 ? floor(ray.pos.y + 1) - ray.pos.y : ceil(ray.pos.y - 1) - ray.pos.y;
-        b.pos.x = b.pos.y * (t_cos / t_sin);
-        a.len = a.pos.x * a.pos.x + a.pos.y * a.pos.y;
-        b.len = b.pos.x * b.pos.x + b.pos.y * b.pos.y;
-        ray.pos.x = (a.len < b.len) ? ray.pos.x + a.pos.x : ray.pos.x + b.pos.x;
-        ray.pos.y = (a.len < b.len) ? ray.pos.y + a.pos.y : ray.pos.y + b.pos.y;
-        ray.side = (a.len < b.len) ? 0 : 1;
-        if (inspect(map, ray, t_sin, t_cos))
-        {
-            ray.len = (ray.pos.x - startPoint.x) * t_cos + (ray.pos.y - startPoint.y) * t_sin;
-            return (ray);
-        }
-    }
-}
+#include "GameObject.hpp"
 
 Raycaster::Raycaster(int nRays) : rays_(nRays), nRays_(nRays) {}
 
 Raycaster::~Raycaster() {
 
-}
-
-void Raycaster::raycasting(const std::vector<std::string> &map, GameActor &actor)
-{
-    double	angle;
-    double	t_sin;
-    double	t_cos;
-    Ray     ray;
-    double  fov;
-    double  step_ray;
-
-    fov = 55 * M_PI / (double)180;
-    step_ray = fov / static_cast<float>(nRays_);
-    angle = actor.angle() - fov / 2;
-    for (int i = 0; i < nRays_; ++i) {
-        angle += step_ray;
-        t_sin = sin(angle);
-        t_cos = cos(angle);
-        rays_[i] = cast_a_ray(actor.position(), t_sin, t_cos, map);
-        rays_[i].len *= cos(angle - actor.angle());
-    }
 }
 
 const Raycaster::Ray& Raycaster::getRay(int n) const {
@@ -84,4 +17,82 @@ const Raycaster::Ray& Raycaster::getRay(int n) const {
 
 int Raycaster::getNRays() const {
     return nRays_;
+}
+
+float dist(sf::Vector2f start, sf::Vector2f end)
+{
+    float a = start.x - end.x;
+    float b = start.y - end.y;
+    return sqrt(a * a + b * b);
+}
+
+Raycaster::Ray norm(const std::vector<std::string> &map, sf::Vector2f vec, sf::Vector2f dir)
+{
+    Raycaster::Ray  ray = {};
+    bool  side;
+    int   mapX = (int)vec.x;
+    int   mapY = (int)vec.y;
+    float stepX;
+    float stepY;
+    float sx;
+    float sy;
+    float dx = abs(1 / dir.x);
+    float dy = abs(1 / dir.y);
+    if (dir.x < 0) {
+        stepX = -1;
+        sx = (vec.x - mapX) * dx;
+    } else {
+        stepX = 1;
+        sx = (mapX + 1.0f - vec.x) * dx;
+    }
+    if (dir.y < 0) {
+        stepY = -1;
+        sy = (vec.y - mapY) * dy;
+    } else {
+        stepY = 1;
+        sy = (mapY + 1.0f - vec.y) * dy;
+    }
+    for (int i = 0; i < 50; ++i) {
+        if (sx < sy) {
+            sx += dx;
+            mapX += stepX;
+            side = false;
+        } else {
+            sy += dy;
+            mapY += stepY;
+            side = true;
+        }
+        char sym = map[mapY][mapX];
+        if (strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZ", sym)) {
+            float len = side == 0 ? sx - dx : sy - dy;
+            ray = {sf::Vector2f(sx, sy), dir,  len, sym, side};
+            break;
+        }
+    }
+    return ray;
+}
+
+sf::Vector2f normalize(sf::Vector2f vec)
+{
+    float inv_length = 1.0f / sqrt(vec.x * vec.x + vec.y * vec.y);
+    return (vec * inv_length);
+}
+
+sf::Vector2f rotate(sf::Vector2f rot, float a);
+
+void Raycaster::raycasting(const std::vector<std::string> &map, GameObject gameObject)
+{
+    sf::Vector2f    dir;
+    dir = normalize(gameObject.getDir());
+    sf::Vector2f    plane = rotate(dir * 0.5f, M_PI_2);
+    sf::Vector2f    rayDir;
+
+    for (int i = 0; i < nRays_; ++i) {
+        double nRay = 2 * i / static_cast<double>(nRays_) - 1;
+        rayDir.x = dir.x + plane.x * nRay;
+        rayDir.y = dir.y + plane.y * nRay;
+        rays_[i] = norm(map, gameObject.getPosition(), rayDir);
+        //printf("%f %f %f %f %f\n", rays_[i].pos.x, rays_[i].pos.y, rays_[i].dir.x, rays_[i].dir.y, rays_[i].len);
+    }
+    //exit(0);
 }

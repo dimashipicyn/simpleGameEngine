@@ -3,35 +3,60 @@
 //
 
 #include "Engine.hpp"
+//#include "GameObject.hpp"
+#include "World.hpp"
+#include "PlayerInputComponent.hpp"
+#include "PlayerPhysicsComponent.hpp"
+#include "PlayerGraphicsComponent.hpp"
 
-Engine::Engine() : input_(), raycaster_(800) {
+Engine::Engine() : raycaster_(800) {
     window_ = new sf::RenderWindow(sf::VideoMode(800, 600),"Default");
-    window_->setFramerateLimit(60);
+    window_->setFramerateLimit(30);
 }
 
 Engine::~Engine() {
     delete window_;
 }
 
-Engine::Engine(const std::string &title, int width, int height) : input_(), raycaster_(width) {
+Engine::Engine(const std::string &title, int width, int height) : raycaster_(width) {
     window_ = new sf::RenderWindow(sf::VideoMode(width, height),title);
     window_->setFramerateLimit(30);
 }
 
-void Engine::input(GameActor &gameActor) {
-    Command * command = input_.handleInput();
-    if (command) {
-        command->execute(gameActor);
+float scalarMul(sf::Vector2f one, sf::Vector2f two)
+{
+    return one.x * two.x + one.y * two.y;
+}
+
+void Engine::drawWall(World &world) {
+    sf::Sprite      wall;
+    sf::IntRect     wallRect;
+    sf::Vector2f    posPlr   = world.player.getPosition();
+    int             winSizeY = static_cast<int>(window_->getSize().y);
+    for (int i = 0; i < raycaster_.getNRays(); ++i) {
+        Raycaster::Ray ray = raycaster_.getRay(i);
+        int height = winSizeY / ray.len;
+        float scale = winSizeY / 64 / ray.len;
+        float offset = ray.side == 0 ? posPlr.y + ray.len * ray.dir.y : posPlr.x + ray.len * ray.dir.x;
+        offset -= floor(offset);
+        wall = world.walls[ray.wallnum - 'A'];
+        wallRect = wall.getTextureRect();
+        wallRect.left = wallRect.left + 64 * offset;
+        wall.setTextureRect(wallRect);
+        float y = roundf((winSizeY - height) / 2.0);
+        wall.setPosition(sf::Vector2f(i, y));
+        wall.setScale(sf::Vector2f(1, scale));
+        if (ray.side)
+            wall.setColor(sf::Color(255, 255, 255, 200));
+        else
+            wall.setColor(sf::Color(255, 255, 255, 255));
+        window_->draw(wall);
     }
 }
 
-void Engine::gameLoop(GameActor &player, Levels &levels) {
+void Engine::gameLoop(World &world) {
     sf::Event event;
-    sf::Sprite sprite;
-    sf::Texture texture;
-    texture.loadFromFile("textures/paper_2.jpg");
-    sf::Vector2u s = texture.getSize();
-    sprite.setTexture(texture);
+
     while (window_->isOpen())
     {
         while (window_->pollEvent(event))
@@ -40,30 +65,21 @@ void Engine::gameLoop(GameActor &player, Levels &levels) {
                 window_->close();
         }
         window_->clear();
-        raycaster_.raycasting(levels.get_level().map, player);
-        input(player);
-        update(player);
-        render(sprite, s);
 
-        //exit(0);
+        raycaster_.raycasting(world.map, world.player);
+        drawWall(world);
+        world.player.update();
+        //update(world.gameObjects);
+
+        world.player.render(window_);
         window_->display();
     }
 }
 
-void Engine::update(GameActor &gameActor) {
-    gameActor.update();
-}
 
-void Engine::render(sf::Sprite &sprite, sf::Vector2u s) {
-    int winSizeY = static_cast<int>(window_->getSize().y);
-    for (int i = 0; i < raycaster_.getNRays(); ++i) {
-        Raycaster::Ray ray = raycaster_.getRay(i);
-        int height = s.y / ray.len;
-        float scale = 1.0 / ray.len;
-        float hit = ray.side ? fabs((int)ray.pos.x - ray.pos.x) : fabs((int)ray.pos.y - ray.pos.y);
-        sprite.setTextureRect(sf::IntRect(hit * s.x, 0, 1, s.y));
-        sprite.setPosition(sf::Vector2f(i, (winSizeY - height) / 2));
-        sprite.setScale(sf::Vector2f(1, scale));
-        window_->draw(sprite);
+void Engine::update(std::vector<GameObject> &gameObjects) {
+    for (int i = 0; i < gameObjects.size(); ++i) {
+        gameObjects[i].update();
     }
 }
+

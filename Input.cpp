@@ -4,9 +4,8 @@
 
 #include "Headers.hpp"
 #include "Input.hpp"
-#include "MoveForwardCommand.hpp"
-#include "RotateLeftCommand.hpp"
 
+/*
 Input::Input() {
     moveForward_ = new MoveForwardCommand();
     rotateLeft_ = new RotateLeftCommand();
@@ -22,3 +21,4 @@ Command *Input::handleInput() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) return rotateLeft_;
     return nullptr;
 }
+*/
