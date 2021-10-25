@@ -21,12 +21,18 @@ public:
     void            setDir(sf::Vector2f dir) {dir_ = dir;};
     sf::Vector2f    getDir() const {return dir_;};
     void            update();
-    void            render(sf::RenderWindow *window);
+    void            render(sf::RenderWindow &window);
 
 protected:
     sf::Vector2f        position_;
     sf::Vector2f        dir_;
-    double              angle_;
+public:
+    const sf::CircleShape &getCollisionShape() const;
+
+    void setCollisionShape(const sf::CircleShape &collisionShape);
+
+protected:
+    sf::CircleShape     collisionShape_;
     InputComponent      *input_;
     PhysicsComponent    *physics_;
     GraphicsComponent   *graphics_;

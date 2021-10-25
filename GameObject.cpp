@@ -23,6 +23,14 @@ void GameObject::update() {
     graphics_->update(*this);
 }
 
-void GameObject::render(sf::RenderWindow *window) {
+void GameObject::render(sf::RenderWindow &window) {
     graphics_->render(window);
+}
+
+const sf::CircleShape &GameObject::getCollisionShape() const {
+    return collisionShape_;
+}
+
+void GameObject::setCollisionShape(const sf::CircleShape &collisionShape) {
+    collisionShape_ = collisionShape;
 }

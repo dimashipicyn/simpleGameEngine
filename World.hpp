@@ -5,25 +5,29 @@
 #ifndef ENGINE_WORLD_HPP
 #define ENGINE_WORLD_HPP
 #include "Headers.hpp"
+#include "Raycaster.hpp"
 #include "GameObject.hpp"
 #include "PlayerInputComponent.hpp"
 #include "PlayerGraphicsComponent.hpp"
 
 class World {
 public:
-    World() : player(new PlayerInputComponent(), 0, new PlayerGraphicsComponent()) {
-
-    }
+    World();
     ~World() {}
+    void    loadLevel();
+    void    update();
+    void    render(sf::RenderWindow &window);
+    void    drawWall(sf::RenderWindow &window);
+
     std::vector<std::string>    map;
     std::vector<GameObject>     gameObjects;
     std::vector<sf::Sprite>     walls;
     GameObject                  player;
     sf::Vector2i                sizeWall;
-    void    loadLevel();
 private:
-    sf::Texture                 gameObjectTexture_;
-    sf::Texture                 wallTexture_;
+    sf::Texture                 mGameObjectTexture;
+    sf::Texture                 mWallTexture;
+    Raycaster                   mRaycaster;
 };
 
 

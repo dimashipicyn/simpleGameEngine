@@ -5,15 +5,12 @@ set(CMAKE_CXX_STANDARD 23)
 find_package(SFML 2.5.1 COMPONENTS graphics audio REQUIRED)
 add_executable(engine
         main.cpp
-        Engine.hpp
-        Engine.cpp
-        Levels.cpp
+        Game.hpp
+        Game.cpp
         Raycaster.hpp
         Raycaster.cpp
         GameObject.hpp
         GameObject.cpp
-        Player.hpp
-        Player.cpp
         PlayerInputComponent.hpp
         PlayerInputComponent.cpp
         World.hpp

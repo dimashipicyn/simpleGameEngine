@@ -92,7 +92,5 @@ void Raycaster::raycasting(const std::vector<std::string> &map, GameObject gameO
         rayDir.x = dir.x + plane.x * nRay;
         rayDir.y = dir.y + plane.y * nRay;
         rays_[i] = norm(map, gameObject.getPosition(), rayDir);
-        //printf("%f %f %f %f %f\n", rays_[i].pos.x, rays_[i].pos.y, rays_[i].dir.x, rays_[i].dir.y, rays_[i].len);
     }
-    //exit(0);
 }
