@@ -6,15 +6,16 @@
 #define ENGINE_PLAYERGRAPHICSCOMPONENT_HPP
 #include "GraphicsComponent.hpp"
 #include "Headers.hpp"
+#include "Textures.h"
 
 class PlayerGraphicsComponent : public GraphicsComponent {
 public:
     PlayerGraphicsComponent() : num(0) {
-        texture_.loadFromFile("textures/weapons1.png");
+        sf::Texture &texture = Textures::mTextures.get(Textures::WEAPON_PISTOL);
         sf::Sprite sprite;
-        sprite.setTexture(texture_);
-        int sizeX = texture_.getSize().x / 64;
-        int sizeY = texture_.getSize().y / 64;
+        sprite.setTexture(texture);
+        int sizeX = texture.getSize().x / 64;
+        int sizeY = texture.getSize().y / 64;
         for (int i = 0; i < sizeY; ++i) {
             int offsetY = i * 65;
             for (int j = 0; j < sizeX; ++j) {
@@ -40,7 +41,6 @@ public:
     }
 
 private:
-    sf::Texture             texture_;
     std::vector<sf::Sprite> sprites_;
     float                   num;
 };

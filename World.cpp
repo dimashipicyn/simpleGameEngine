@@ -3,6 +3,8 @@
 //
 
 #include "World.hpp"
+#include "ResourceHolder.h"
+#include "Textures.h"
 
 void World::loadLevel() {
     std::string     line;
@@ -35,9 +37,9 @@ void World::loadLevel() {
 }
 
 World::World() :
-player(new PlayerInputComponent(), 0, new PlayerGraphicsComponent()), mRaycaster(800)
+player(new PlayerInputComponent(), 0, new PlayerGraphicsComponent()),
+mRaycaster(800)
 {
-
 }
 
 void World::update() {

@@ -15,5 +15,9 @@ add_executable(engine
         PlayerInputComponent.cpp
         World.hpp
         World.cpp
+        ResourceHolder.h
+        Textures.h
+        Textures.cpp
+        Player.h
         )
 target_link_libraries(engine sfml-graphics sfml-audio sfml-window sfml-system)

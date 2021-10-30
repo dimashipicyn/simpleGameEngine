@@ -7,7 +7,6 @@
 #include "Headers.hpp"
 
 class World;
-class Graphics;
 class InputComponent;
 class PhysicsComponent;
 class GraphicsComponent;

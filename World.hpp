@@ -9,6 +9,7 @@
 #include "GameObject.hpp"
 #include "PlayerInputComponent.hpp"
 #include "PlayerGraphicsComponent.hpp"
+#include "Textures.h"
 
 class World {
 public:
